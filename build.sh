@@ -17,14 +17,15 @@ make -j
 
 cd ../../../
 
+echo "Uncompress vocabulary ..."
+
+cd Vocabulary
+tar -xf ORBvoc.txt.tar.gz
+cd ..
+
 echo "Configuring and building ORB_SLAM2 ..."
 
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
-make 
-
-cd ..
-
-echo "Converting vocabulary to binary"
-./tools/bin_vocabulary
+make -j

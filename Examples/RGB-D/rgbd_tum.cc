@@ -23,11 +23,11 @@
 #include<algorithm>
 #include<fstream>
 #include<chrono>
-#include "pointcloudmapping.h"
-#include<opencv2/core/core.hpp>
-#include<stdlib.h>
 
-#include <cstdio>
+#include<opencv2/core/core.hpp>
+
+#include<System.h>
+
 using namespace std;
 
 void LoadImages(const string &strAssociationFilename, vector<string> &vstrImageFilenamesRGB,
@@ -117,12 +117,11 @@ int main(int argc, char **argv)
         if(ttrack<T)
             usleep((T-ttrack)*1e6);
     }
-    while(SLAM.mpPointCloudMapping->loopbusy || SLAM.mpPointCloudMapping->cloudbusy)
-    {
-        cout<<"";
-    }
+
+    // Stop all threads
+    SLAM.Shutdown();
+
     // Tracking time statistics
-    SLAM.mpPointCloudMapping->bStop = true;
     sort(vTimesTrack.begin(),vTimesTrack.end());
     float totaltime = 0;
     for(int ni=0; ni<nImages; ni++)
@@ -132,22 +131,11 @@ int main(int argc, char **argv)
     cout << "-------" << endl << endl;
     cout << "median tracking time: " << vTimesTrack[nImages/2] << endl;
     cout << "mean tracking time: " << totaltime/nImages << endl;
-    //
+
     // Save camera trajectory
-    SLAM.SaveTrajectoryTUM("CameraTrajectory1.txt");
-    SLAM.SaveKeyFrameTrajectoryTUM("CameraTrajectory2.txt");
-    // Stop all threads
- 
-    
-        SLAM.save();
+    SLAM.SaveTrajectoryTUM("CameraTrajectory.txt");
 
-        SLAM.Shutdown();
-
-    
-    
     return 0;
-
-
 }
 
 void LoadImages(const string &strAssociationFilename, vector<string> &vstrImageFilenamesRGB,

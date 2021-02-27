@@ -21,12 +21,12 @@
 #ifndef MAPPOINT_H
 #define MAPPOINT_H
 
-#include"KeyFrame.h"
-#include"Frame.h"
-#include"Map.h"
+#include "KeyFrame.h"
+#include "Frame.h"
+#include "Map.h"
 
-#include<opencv2/core/core.hpp>
-#include<mutex>
+#include <opencv2/core/core.hpp>
+#include <mutex>
 
 namespace ORB_SLAM2
 {
@@ -78,14 +78,13 @@ public:
 
     float GetMinDistanceInvariance();
     float GetMaxDistanceInvariance();
-    int PredictScale(const float &currentDist, KeyFrame*pKF);
-    int PredictScale(const float &currentDist, Frame* pF);
+    int PredictScale(const float &currentDist, const float &logScaleFactor);
 
 public:
-    long unsigned int mnId;///< Global ID for MapPoint
+    long unsigned int mnId;
     static long unsigned int nNextId;
-    long int mnFirstKFid;///< 创建该MapPoint的关键帧ID
-    long int mnFirstFrame;///< 创建该MapPoint的帧ID（即每一关键帧有一个帧ID）
+    long int mnFirstKFid;
+    long int mnFirstFrame;
     int nObs;
 
     // Variables used by the tracking
@@ -93,19 +92,9 @@ public:
     float mTrackProjY;
     float mTrackProjXR;
     bool mbTrackInView;
-    // TrackLocalMap - UpdateLocalPoints中防止将MapPoints重复添加至mvpLocalMapPoints的标记
     int mnTrackScaleLevel;
     float mTrackViewCos;
-    // TrackLocalMap - SearchByProjection中决定是否对该点进行投影的变量
-    // mbTrackInView==false的点有几种：
-    // a 已经和当前帧经过匹配（TrackReferenceKeyFrame，TrackWithMotionModel）但在优化过程中认为是外点
-    // b 已经和当前帧经过匹配且为内点，这类点也不需要再进行投影
-    // c 不在当前相机视野中的点（即未通过isInFrustum判断）
     long unsigned int mnTrackReferenceForFrame;
-    // TrackLocalMap - SearchLocalPoints中决定是否进行isInFrustum判断的变量
-    // mnLastFrameSeen==mCurrentFrame.mnId的点有几种：
-    // a 已经和当前帧经过匹配（TrackReferenceKeyFrame，TrackWithMotionModel）但在优化过程中认为是外点
-    // b 已经和当前帧经过匹配且为内点，这类点也不需要再进行投影
     long unsigned int mnLastFrameSeen;
 
     // Variables used by local mapping
@@ -125,20 +114,16 @@ public:
 protected:    
 
      // Position in absolute coordinates
-     cv::Mat mWorldPos;///< MapPoint在世界坐标系下的坐标
+     cv::Mat mWorldPos;
 
      // Keyframes observing the point and associated index in keyframe
-     std::map<KeyFrame*,size_t> mObservations;///< 观测到该MapPoint的KF和该MapPoint在KF中的索引
+     std::map<KeyFrame*,size_t> mObservations;
 
      // Mean viewing direction
-     // 该MapPoint平均观测方向
      cv::Mat mNormalVector;
 
      // Best descriptor to fast matching
-     // 每个3D点也有一个descriptor
-    // 如果MapPoint与很多帧图像特征点对应（由keyframe来构造时），那么距离其它描述子的平均距离最小的描述子是最佳描述子
-    // MapPoint只与一帧的图像特征点对应（由frame来构造时），那么这个特征点的描述子就是该3D点的描述子
-     cv::Mat mDescriptor;///< 通过 ComputeDistinctiveDescriptors() 得到的最优描述子
+     cv::Mat mDescriptor;
 
      // Reference KeyFrame
      KeyFrame* mpRefKF;

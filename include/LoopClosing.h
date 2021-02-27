@@ -26,13 +26,13 @@
 #include "Map.h"
 #include "ORBVocabulary.h"
 #include "Tracking.h"
-#include "pointcloudmapping.h"
+
 #include "KeyFrameDatabase.h"
 
 #include <thread>
 #include <mutex>
-#include "Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h"
-class PointCloudMapping;
+#include <g2o/types/sim3/types_seven_dof_expmap.h>
+
 namespace ORB_SLAM2
 {
 
@@ -51,7 +51,7 @@ public:
 
 public:
 
-    LoopClosing(Map* pMap, KeyFrameDatabase* pDB, ORBVocabulary* pVoc,const bool bFixScale, shared_ptr<PointCloudMapping> pPointCloud);
+    LoopClosing(Map* pMap, KeyFrameDatabase* pDB, ORBVocabulary* pVoc,const bool bFixScale);
 
     void SetTracker(Tracking* pTracker);
 
@@ -66,7 +66,7 @@ public:
 
     // This function will run in a separate thread
     void RunGlobalBundleAdjustment(unsigned long nLoopKF);
-    shared_ptr<PointCloudMapping>  mpPointCloudMapping;
+
     bool isRunningGBA(){
         unique_lock<std::mutex> lock(mMutexGBA);
         return mbRunningGBA;
@@ -80,8 +80,6 @@ public:
 
     bool isFinished();
 
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-     int loopcount = 0;
 protected:
 
     bool CheckNewKeyFrames();
@@ -141,9 +139,6 @@ protected:
 
     // Fix scale in the stereo/RGB-D case
     bool mbFixScale;
-
-
-    bool mnFullBAIdx;
 };
 
 } //namespace ORB_SLAM
